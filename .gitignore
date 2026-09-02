@@ -1,0 +1,15 @@
+# Environment files
+.env
+
+# Temporary image downloads
+temp_*/
+
+# Python cache & virtual environment
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Local archives
+*.cbz
+*.zip

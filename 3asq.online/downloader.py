@@ -7,11 +7,11 @@ from bs4 import BeautifulSoup
 
 # Configuration
 MANGA_SLUG = "kingdom-2"  # Target manga slug on 3asq.online
-START_CHAPTER = 61
-END_CHAPTER = 62
+START_CHAPTER = 185
+END_CHAPTER = 200
 
 # Destination folder for CBZ files
-OUTPUT_DIR = r"C:\Users\you\manga"
+OUTPUT_DIR = r"C:\Users\hamro\Videos\manga"
 
 HEADERS = {
     "User-Agent": (
