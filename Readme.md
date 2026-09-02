@@ -1,78 +1,119 @@
 # Manga Downloader & CBZ Converter
 
-An automated Python tool designed to scrape manga chapters from sites powered by the Madara/wp-manga theme (e.g., `3asq.online`), package each chapter directly into `.cbz` comic book archives, and save them directly to your local library folder for reading in **YACReader**.
+An automated Python toolset built with **Playwright** and **Requests** to scrape manga chapters from various online readers (e.g., `3asq.online`, `mangadar.com`), bypass lazy-loading and anti-bot protections, package each chapter directly into `.cbz` comic book archives, and save them to your local library folder for reading in **YACReader**.
 
 ---
 
 ## 📋 Features
-- Automatically downloads chapter images from `div.reading-content`.
-- Handles lazy-loaded image attributes (`data-src`, `data-lazy-src`, `src`).
-- Packages downloaded images directly into `.cbz` format with ordered page numbering (`001.jpg`, `002.jpg`, etc.).
-- Automatically moves completed `.cbz` files to your designated manga destination folder.
-- Cleans up temporary uncompressed files after packaging.
-- Seamlessly integrates with **YACReader** for comic/manga reading.
+
+* **Multi-Site Scrapers:** Dedicated scripts tailored for different manga hosting platforms and reader architectures.
+* **Headless Browser Automation:** Uses Playwright (Chromium) to execute dynamic JavaScript and fetch images via authenticated browser contexts.
+* **Element Viewport Hydration:** Scrolls to each individual image element prior to scraping to ensure lazy-loaded attributes (`data-src`, `data-lazy-src`, `data-url`) are fully populated in the DOM.
+* **Environment-Based Configuration:** Dynamically loads output folder paths from a root `.env` file to keep local machine paths out of Git history.
+* **CBZ Archiving:** Packages downloaded chapter images directly into ordered `.cbz` archives (`001.jpg`, `002.jpg`, etc.).
+* **Automatic Cleanup & Deduplication:** Cleans up temporary image files after archiving and skips downloading chapters that already exist in your destination folder.
+* **YACReader Compatible:** Produces standardized archives ready for instant reading in **YACReader**.
 
 ---
 
 ## ⚙️ Requirements & Installation
 
-1. Make sure **Python 3.x** is installed on your system.
-2. Install the required Python packages:
+### 1. Install Python
 
-```bash
-pip install requests bs4
+Ensure **Python 3.8+** is installed on your system.
+
+### 2. Clone the Repository
+
+Clone the repository and navigate into the project directory:
+
+```powershell
+git clone https://github.com/rizu-SM/manga-craft
+cd manga_craft
 ```
 
-3. Download and install **YACReader** (if not already installed):
-   - Website: [https://www.yacreader.com/](https://www.yacreader.com/)
+### 3. Install Python Dependencies
+
+```powershell
+pip install playwright python-dotenv requests beautifulsoup4
+```
+
+### 4. Install Playwright Browser Binaries
+
+```powershell
+playwright install chromium
+```
+
+### 5. Install YACReader
+
+Download and install **YACReader** if you don't already have it.
+
+Website: https://www.yacreader.com/
 
 ---
 
-## 🛠️ User Configurations (`downloader.py`)
+## 🔑 Environment Setup (`.env`)
 
-Before running the script, open `downloader.py` in your text editor and adjust the configuration parameters at the top of the file according to your needs:
+Create a `.env` file in the project root directory:
 
-| Variable | Description | Example Value |
-| :--- | :--- | :--- |
-| `MANGA_SLUG` | The URL identifier of the target manga on the website | `"one-piece"` |
-| `START_CHAPTER` | The starting chapter number to download | `61` |
-| `END_CHAPTER` | The ending chapter number to download | `65` |
-| `OUTPUT_DIR` | The destination directory where `.cbz` files will be saved | `r"C:\Users\hamro\Videos\manga"` |
+```text
+manga_craft/
+├── .env
+└── ...
+```
 
-### Configuration Example in `downloader.py`:
+Define your local output destination inside `.env`:
+
+```env
+OUTPUT_DIR=C:\Users\hamro\Videos\manga
+```
+
+> **Note:** Copy `.env.example` to `.env` if using a cloned template. `.env` is ignored by Git to keep personal storage paths out of public repositories.
+
+---
+
+## 🛠️ Project Structure & Usage
+
+This repository contains multiple scrapers targeting different websites:
+
+```text
+manga_craft/
+├── .env
+├── downloader.py              # Scraper for 3asq.online (Madara / wp-manga theme)
+└── mangadar/
+    └── sec-download.py        # Playwright scraper for mangadar.com
+```
+
+### Option 1: Scraping 3asq.online (`downloader.py`)
+
+Open `downloader.py` and set your target manga slug and chapter range:
 
 ```python
-# ==========================================
-# USER CONFIGURATION SECTION
-# ==========================================
-
-# 1. Target Manga Slug (found in the site URL: https://3asq.online/manga/<MANGA_SLUG>/)
 MANGA_SLUG = "one-piece"
-
-# 2. Chapter Range
 START_CHAPTER = 61
 END_CHAPTER = 65
-
-# 3. Destination folder for CBZ files
-OUTPUT_DIR = r"C:\Users\you\manga
-# ==========================================
 ```
 
----
+Run the script:
 
-## 🚀 How to Run
-
-1. Open PowerShell or Command Prompt in your project directory:
 ```powershell
-   git clone https://github.com/rizu-SM/manga-craft
-   ```
-   ```powershell
-   cd manga_craft
-   ```
-2. Run the script:
-   ```powershell
-   python .\downloader.py
-   ```
+python .\downloader.py
+```
+
+### Option 2: Scraping Mangadar (`mangadar/sec-download.py`)
+
+Open `mangadar/sec-download.py` and set your URL template and chapter range:
+
+```python
+URL_TEMPLATE = "https://mangadar.com/manga/kingdom/{}"
+START_CHAPTER = 185
+END_CHAPTER = 200
+```
+
+Run the script:
+
+```powershell
+python .\mangadar\sec-download.py
+```
 
 ---
 
@@ -81,7 +122,27 @@ OUTPUT_DIR = r"C:\Users\you\manga
 Once the script finishes downloading and generating the `.cbz` files:
 
 1. Launch **YACReader**.
+
 2. Press **`O`** on your keyboard to open the file picker.
-3. Navigate to your output folder (`C:\Users\hamro\Videos\manga`).
-4. Select your generated `.cbz` file (e.g., `chapter_61.cbz`) and open it.
-5. Enjoy reading!
+
+3. Navigate to your configured output folder, for example:
+
+   ```text
+   C:\Users\hamro\Videos\manga
+   ```
+
+4. Select your generated `.cbz` file, for example:
+
+   ```text
+   Kingdom_Chapter_185.cbz
+   ```
+
+5. Open the file and enjoy reading.
+
+---
+
+## 📌 Notes
+
+* Keep your `.env` file private and never commit it to Git.
+* Make sure the target websites allow automated access and downloading.
+* The scrapers may need updates if the target websites change their HTML structure or anti-bot mechanisms.
